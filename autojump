@@ -1,50 +1,87 @@
 # step 1: copy the following code into ~/.bashrc file.
 # step 2: source ~/.bashrc
 # step 3: just type "j some-dir" in your command line to change the working directory.
+function match_abs_dir {
+	[ -z "$1" ] && echo "" && return
+
+	dir=$1
+	min=0
+	target=""
+	dir_list=`cat ~/.bash_history | sed 's/^\s+//g' |awk '/^cd/ {print $2}'`
+	for _dir in $dir_list
+	do
+		if [[ ! $_dir == /* ]]; then
+			continue
+		fi
+		if [ ! -d $_dir ]; then
+			continue
+		fi
+		if [[ $_dir == *$dir || $_dir == *$dir/ ]]; then
+			if [ $min -eq 0 -o $min -gt ${#_dir} ]; then
+				min=${#_dir}
+				target=$_dir
+			fi
+		fi
+	done
+	echo $target
+}
+
+function match_rel_dir {
+	[ -z "$1" ] && echo "" && return
+
+	dir=$1
+	min=0
+	target=""
+	dir_list=`cat ~/.bash_history | sed 's/^\s+//g' |awk '/^cd/ {print $2}'`
+	for _dir in $dir_list
+	do
+		if [[ $_dir	== /* ]]; then
+			continue
+		fi
+		if [ ! -d $_dir -o ! -d ~/$_dir ]; then
+			continue
+		fi
+		if [[ $_dir == *$dir || $_dir == *$dir/ ]]; then
+			if [ $min -eq 0 -o $min -gt ${#_dir} ]; then
+				min=${#_dir}
+				target=$_dir
+			fi
+		fi
+	done
+	echo $target
+}
+
 function j {
     [ -z "$1" ] && cd ~ && return
 
-    dir=$1
-    min=0
-    target=""
-    dir_list=`cat ~/.bash_history | sed -r 's/^\s+//g' |awk '/^cd/ {print $2}'`
-    for _dir in $dir_list
-    do
-        # skip not exist dir. 
-        if [ ! -d $_dir -a ! -d ~/$_dir ]; then
-            continue
-        fi
+	dir=$1
+	if [ -d $dir ]; then
+		cd $dir
+		return
+	fi
 
-        # suffix precedent.
-        if [[ $_dir == *$dir || $_dir == *$dir/ ]]; then
-            if [ $min -eq 0 -o $min -gt ${#_dir} ]; then
-                min=${#_dir}
-                target=$_dir
-            fi
-        fi
+	target=`match_abs_dir $dir`
+	if [ ! -z "$target" ]; then
+		cd $target
+		return
+	fi
 
-    done
+	target=`match_rel_dir $dir`
+	if [ ! -z "$target" ]; then
+		if [ -d $target ]; then
+			cd $target
+			return
+		fi
+		if [ -d ~/$target ]; then
+			cd ~/$target
+			return
+		fi
+	fi
 
-    # degrade handle. 
-    if [ -z $target ]; then
-        if [ -d $dir ]; then
-            target=$dir
-        elif [ -d ~/$dir ]; then
-            target=~/$dir
-        fi
-    elif [ ! -d $target ]; then
-        if [ -d ~/$target ]; then
-            target=~/$target
-        fi
-    fi
+	if [ -d ~/$dir ]; then
+		cd ~/$dir
+		return
+	fi
 
-    #echo $target
-
-    if [ ! -z $target ]; then
-        cd $target && return
-    fi
-
-    # hand over to shell.
-    cd $dir
+	cd $dir
 }
-
