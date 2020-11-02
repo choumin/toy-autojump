@@ -7,7 +7,7 @@ function match_abs_dir {
 	dir=$1
 	min=0
 	target=""
-	dir_list=`cat ~/.bash_history | sed 's/^\s+//g' |awk '/^cd/ {print $2}'`
+	dir_list=`cat ~/.bash_history | sed 's/^\s+//g' |awk '/^cd |^j / {print $2}'`
 	for _dir in $dir_list
 	do
 		if [[ ! $_dir == /* ]]; then
@@ -32,7 +32,7 @@ function match_rel_dir {
 	dir=$1
 	min=0
 	target=""
-	dir_list=`cat ~/.bash_history | sed 's/^\s+//g' |awk '/^cd/ {print $2}'`
+	dir_list=`cat ~/.bash_history | sed 's/^\s+//g' |awk '/^cd |^j / {print $2}'`
 	for _dir in $dir_list
 	do
 		if [[ $_dir	== /* ]]; then
