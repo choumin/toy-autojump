@@ -38,7 +38,7 @@ function match_rel_dir {
 		if [[ $_dir	== /* ]]; then
 			continue
 		fi
-		if [ ! -d $_dir -o ! -d ~/$_dir ]; then
+		if [ ! -d $_dir -a ! -d ~/$_dir ]; then
 			continue
 		fi
 		if [[ $_dir == *$dir || $_dir == *$dir/ ]]; then
