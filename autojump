@@ -16,7 +16,8 @@ function match_abs_dir {
 		if [ ! -d $_dir ]; then
 			continue
 		fi
-		if [[ $_dir == *$dir || $_dir == *$dir/ ]]; then
+		#if [[ $_dir == *$dir || $_dir == *$dir/ ]]; then
+		if [[ $_dir == $dir* ]]; then
 			if [ $min -eq 0 -o $min -gt ${#_dir} ]; then
 				min=${#_dir}
 				target=$_dir
@@ -41,7 +42,8 @@ function match_rel_dir {
 		if [ ! -d $_dir -a ! -d ~/$_dir ]; then
 			continue
 		fi
-		if [[ $_dir == *$dir || $_dir == *$dir/ ]]; then
+		#if [[ $_dir == *$dir || $_dir == *$dir/ ]]; then
+		if [[ $_dir == $dir* ]]; then
 			if [ $min -eq 0 -o $min -gt ${#_dir} ]; then
 				min=${#_dir}
 				target=$_dir
